@@ -1,5 +1,5 @@
-# Ignore
+# Ignore large files
 
 *.csv
 *.geojson
-*.html
+

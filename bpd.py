@@ -1,4 +1,3 @@
-
 import geopandas as gpd
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -42,22 +41,44 @@ gdf_nonmissing.dtypes
 
 gdf_nonmissing = gdf_nonmissing[gdf_nonmissing['ArrestDateTime'].dt.year == 2024]
 
+
+# Subset certain offenses
+
+offenses_list = pd.DataFrame(gdf_nonmissing.ChargeDescription.value_counts())
+
+
+# Subset rows where 'text' column contains 'apple' or 'pie'
+words = ['GUN', 'FIREARM', 'SHOOT', 'SHOT', 'ARM', 'WEAPON']
+values_to_remove = ['UNARM'] 
+subset_df = gdf_nonmissing[gdf_nonmissing['ChargeDescription'].str.contains('|'.join(words), case=False, na=False)]
+subset_df = subset_df[~subset_df['ChargeDescription'].str.contains('|'.join(values_to_remove), case=False, na=False)].copy()
+
+
+# Review data closer
+
+subset_df['address_test'] = subset_df['ArrestLocation'] ==subset_df['IncidentLocation']
+
+# TODO add different color markers and legend for offense types
+
+
 # Make map
 
 map_center = [gdf_nonmissing.geometry.y.mean(), gdf_nonmissing.geometry.x.mean()]
-m = folium.Map(location=map_center, zoom_start=12)
+m = folium.Map(location=[39.28775297151215, -76.6066912216659], zoom_start=17)
 
-# Add crime points to the map using apply()
+    # Add crime points 
+
 def add_crime_marker(row):
     folium.Marker(
         location=[row.latitude, row.longitude],
     ).add_to(m)
 
-# Apply the function to each row of the GeoDataFrame
-gdf_nonmissing.apply(add_crime_marker, axis=1)
-# Save to an HTML file
-m.save("map_arrests.html")
-webbrowser.open("map_arrests.html")
+gdf_nonmissing.apply(add_crime_marker, axis=1) # Apply the function to each row of the GeoDataFrame
+
+# Save to HTML
+
+m.save("911_Weapons_Incident_Inner_Harbor_Locations_2024.html")
+webbrowser.open("911_Weapons_Incident_Inner_Harbor_Locations_2024.html")
 
 
 
