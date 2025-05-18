@@ -17,8 +17,19 @@ new_dir = Path("/home/kathy/Documents/projects/bpd")
 os.chdir(new_dir)  
 print(Path.cwd()) 
 
-codes = pd.read_xml("cjiscode.xml")
+# Read CJIS codes file and clean
+
+codes = pd.read_xml("cjiscode.xml") # Source: Downloaded 05/17/2025
+print(codes.columns.tolist())
+codes.columns = codes.columns.str.replace(" ", "_")
+codes.columns = 'c_' + codes.columns.astype(str)
+print(codes.columns.tolist())
+codes = codes.rename(columns={
+    'c_cjisclass': 'Charge'
+})
 codes.to_csv("CJIS_codes.csv", index=False)
+
+# Read arrest geojson file
 
 gdf = gpd.read_file("BPD_Arrests.geojson") # Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021
 print(gdf.head())
@@ -34,6 +45,7 @@ if gdf.crs != "EPSG:4326":
 gdf["longitude"] = gdf.geometry.x
 gdf["latitude"] = gdf.geometry.y
 
+
 # Drop missing
 gdf_nonmissing = gdf.dropna(subset=['latitude', 'longitude'])
 print(gdf_nonmissing.head())
@@ -48,21 +60,51 @@ gdf_nonmissing.dtypes
 gdf_nonmissing = gdf_nonmissing[gdf_nonmissing['ArrestDateTime'].dt.year == 2024]
 
 
-# Subset certain offenses
+# Merge CJIS codes
 
-offenses_list = pd.DataFrame(gdf_nonmissing.ChargeDescription.value_counts())
+merged = pd.merge(gdf_nonmissing, codes, on="Charge", how="left")
+
+code_descriptions_list = merged.c_describe70.value_counts()
+
+merged['describe_test'] = merged['c_describe100']== merged['c_describe70']
 
 
 # Subset rows 
 
-words = ['GUN', 'FIREARM', 'SHOOT', 'SHOT', 'ARM', 'WEAPON','HGV']
-values_to_remove = ['UNARM', 'FALSE FIRE ALARM','ATTEMPTED UMARMED ROBBERY'] 
-subset_df = gdf_nonmissing[gdf_nonmissing['ChargeDescription'].str.contains('|'.join(words), case=False, na=False)]
-subset_df = subset_df[~subset_df['ChargeDescription'].str.contains('|'.join(values_to_remove), case=False, na=False)].copy()
+words = ['GUN', 'FIREARM', 'SHOOT', 'SHOT', 'ARM', 'WEAPON','HGV', 'PISTOL']
+values_to_remove = ['UNARM'] 
+merged_subset = merged[merged['c_describe100'].str.contains('|'.join(words), case=False, na=False)]
+merged_subset = merged_subset[~merged_subset['c_describe100'].str.contains('|'.join(values_to_remove), case=False, na=False)].copy()
 
-# Review data closer
+merged_subsetted_out = merged[~merged['c_describe100'].str.contains('|'.join(words), case=False, na=False)]
 
-subset_df['address_test'] = subset_df['ArrestLocation'] ==subset_df['IncidentLocation']
+
+merged_offenses_list = merged_subset.c_describe100.value_counts()
+merged_offenses_not_listed = merged_subsetted_out.c_describe100.value_counts()
+
+
+# Check whether arrest and incidents match (they do)
+
+merged_subset['address_test'] = merged_subset['ArrestLocation'] ==merged_subset['IncidentLocation']
+
+
+# Rename columns
+
+merged_subset = merged_subset.rename(columns={
+    'Gender': 'Sex'
+})
+
+
+
+
+
+
+
+
+# Subset certain offenses
+
+offenses_list = pd.DataFrame(gdf_nonmissing.ChargeDescription.value_counts())
+
 
 
 # Make map
@@ -85,11 +127,7 @@ m.save("Inner_Harbor_Arrests_2024.html")
 webbrowser.open("Inner_Harbor_Arrests_2024.html")
 """
 
-# Rename columns
 
-subset_df = subset_df.rename(columns={
-    'Gender': 'Sex'
-})
 
 # TODO add different color markers and legend for offense types
 
@@ -143,6 +181,9 @@ subset_df["Description"] = subset_df["Description"].replace(rename_dict)
 # Review handgun violation charges
 
 handgun_violations = subset_df[subset_df['ChargeDescription'] == 'HANDGUN VIOLATION']
+
+
+
 
 
 handgun_vios_dict = {
