@@ -6,4 +6,7 @@ This is a personal project mapping 2024 weapons-related incidents in the city. T
   The primary script for cleaning and analyzing data.
 
 `911_Weapons_Incident_Inner_Harbor_Locations_2024.html`  
-  The first map for this project. I chose this location because (`.html`) for easily viewing figures.
+  The first map for this project. I chose this location because I frequent it.
+
+`cjiscode.xml`
+  I merged Maryland Criminal Justice Information System codes into the file for more consistent charge descriptions. [https://www.mdcourts.gov/district/chargedb](https://www.mdcourts.gov/district/chargedb)
