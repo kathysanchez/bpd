@@ -4,7 +4,8 @@ import pandas as pd
 from pathlib import Path
 import os
 import plotly.express as px
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, callback_context, dcc, html, Input, Output, State
+from dash.exceptions import PreventUpdate
 # import matplotlib.pyplot as plt
 # from matplotlib.dates import DateFormatter
 # import seaborn as sns
@@ -147,7 +148,7 @@ webbrowser.open("Inner_Harbor_Arrests_2024.html")
 """
 
 # App instance
-app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) # https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/explorer/
+app = Dash(__name__, external_stylesheets=[dbc.themes.YETI]) # https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/explorer/
 
 # Layout
 
@@ -165,45 +166,118 @@ print(sorted_charges)
 
     # Create options 
 charge_options = []
+#select_all = 'Select All'
 
 for charge in sorted_charges:
     charge_options.append({'label': charge, 'value': charge})# Label is the displayed text and value is passed to callbacks
 
 app.layout = html.Div(
     children = [
-        html.H1("Baltimore Weapons-Related Arrests, 2024"), # style={'fontFamily': 'Arial, sans-serif'},
-        dbc.Row([
-            dbc.Col(
-                dbc.Checklist(
-                    id='crime-type-filter',
-                    options=charge_options,
-                    value=[sorted(merged_descriptions['Charge'].dropna().unique())[0]],
-                    style={'marginTop': '40px', 'marginLeft':'30px'}
+        html.H1("Baltimore Weapons-Related Arrests, 2024", style={'marginLeft':'30px', 'marginTop':'10px'}), 
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.Label("Select Charge", style={
+                        'fontSize': '16px',
+                        'color': '#333',
+                        'marginBottom': '10px',
+                        }),
+                        html.Div(
+                            dcc.Checklist(
+                                id='charge-checklist-filter',
+                                options=[{'label': 'Select All', 'value': 'Select All'}],
+                                value=['Select All'], #sorted(merged_descriptions['Charge'].dropna().unique())[0]
+                                #style={'marginRight':'30px'},
+                            )
+                        ),
+                        html.Div(
+                            dcc.Dropdown(
+                                id='charge-dropdown-filter',
+                                options=charge_options,
+                                value=[], #sorted(merged_descriptions['Charge'].dropna().unique())[0]
+                                #style={'marginRight':'30px'},
+                                multi=True,
+                                searchable=True
+                            )
+                        )
+                    ],
+                    width=3, #style={'marginLeft':'30px'},
+                    ),
+                dbc.Col(
+                    dcc.Graph(id='crime-map',
+                        style={'marginRight':'30px'}
                     ), 
-                width=3
-            ),
-            dbc.Col(
-                dcc.Graph(id='crime-map',
-                    style={'marginTop': '40px', 'marginRight':'30px'}
-                ), width=9)
-        ])
+                width=9)],
+            style={'marginTop':'40px', 'marginLeft':'30px'}
+        )
     ]
 )
 
-# Callback to update the map based on crime type
+# Callback to keep dropdown and checkbox connected
+@app.callback(
+    [
+        Output(component_id='charge-dropdown-filter', component_property='value'),
+        Output(component_id='charge-checklist-filter', component_property='value')
+    ],
+    [
+        Input(component_id='charge-checklist-filter', component_property='value'),
+        Input(component_id='charge-dropdown-filter', component_property='value')
+    ],
+    State(component_id='charge-dropdown-filter', component_property='options')
+)
+
+def sync_checklist_dropdown(checklist_value, dropdown_value, dropdown_options):
+    all_charges = []
+    for option in dropdown_options:
+        all_charges.append(option['value'])
+    
+    triggered_id = callback_context.triggered_id
+    
+    # If checklist triggered the callback
+    if triggered_id == 'charge-checklist-filter':
+        if 'Select All' in checklist_value:
+            return all_charges, ['Select All']  # Select all dropdown options, keep checklist checked
+        else:
+            return [], []  # Clear dropdown, uncheck checklist
+    
+    # If dropdown triggered the callback
+    if triggered_id == 'charge-dropdown-filter':
+        if len(dropdown_value) == len(all_charges) and dropdown_value:
+            return dropdown_value, ['Select All']  # Keep dropdown values, check checklist
+        else:
+            return dropdown_value, []  # Keep dropdown values, uncheck checklist
+    
+    # Default case for initial load or unexpected triggers
+    if len(dropdown_value) == len(all_charges) and dropdown_value:
+        return dropdown_value, ['Select All']
+    return dropdown_value, []
+
+# Callback to update the map based on dropdown selections
 @app.callback(
     Output('crime-map', 'figure'),
-    Input('crime-type-filter', 'value')
+    Input('charge-dropdown-filter', 'value')
 )
-def update_map(selected_type):
-    filtered = merged_descriptions[merged_descriptions['Charge'].isin(selected_type)]
 
-    fig = px.scatter_map(
+def update_map(selected_charges):
+    # If no charges selected, return empty map
+    if not selected_charges:
+        fig = px.scatter_mapbox(
+            lat=[39.2904], lon=[-76.6122], zoom=12, height=600,
+            center={"lat": 39.2904, "lon": -76.6122}, mapbox_style="carto-positron"
+        )
+        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        return fig
+
+    # Filter data based on selected charges
+    filtered = merged_descriptions[merged_descriptions['Charge'].isin(selected_charges)]
+
+    # Create scatter map
+    fig = px.scatter_mapbox(
         filtered,
         lat="latitude",
         lon="longitude",
         hover_name="Charge",
-        #hover_data={"Age":True, "Sex":True, "Race":True, "Detail":True, "latitude": False, "longitude": False}, 
         custom_data=["Charge", "Age", "Sex", "Race", "Detail"],
         zoom=12,
         center={"lat": 39.2904, "lon": -76.6122},
@@ -211,23 +285,18 @@ def update_map(selected_type):
     )
     fig.update_traces(
         hovertemplate=", ".join([
-            "<b>%{customdata[0]}</b><br>%{customdata[1]}",
-            "%{customdata[2]}",
-            "%{customdata[3]}<br>Detail: %{customdata[4]}"
+            "<b>%{customdata[0]}</b><br>Age: %{customdata[1]}",
+            "Sex: %{customdata[2]}",
+            "Race: %{customdata[3]}<br>Detail: %{customdata[4]}"
         ])
     )
-
     fig.update_layout(
         mapbox_style="carto-positron",
-        margin={"r":0,"t":0,"l":0,"b":0}
-        #font=dict(
-        #family="Open Sans, sans-serif",  
-        #size=14,    
-        #color="black"
-        #)
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
 
     return fig
+
 
 # Run server
 if __name__ == '__main__':
