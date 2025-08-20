@@ -3,3 +3,9 @@
 *.csv
 *.geojson
 
+# Ignore old files
+*/archive/
+
+# Ignore temp files
+__pycache__
+
