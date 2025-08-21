@@ -6,7 +6,7 @@ import os
 
 
 print(Path.cwd())  
-new_dir = Path("/home/kathy/Documents/projects/bpd") 
+new_dir = Path(__file__).parent
 os.chdir(new_dir)  
 print(Path.cwd()) 
 
