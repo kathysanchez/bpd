@@ -1,8 +1,8 @@
-
 import geopandas as gpd
 import pandas as pd
 from pathlib import Path
 import os
+import requests
 
 
 print(Path.cwd())  
@@ -22,9 +22,20 @@ codes = codes.rename(columns={
 })
 codes.to_csv("./CJIS/CJIS_codes.csv", index=False)
 
-# Read arrest geojson file
+# Read arrest geojson file (Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021)
 
-gdf = gpd.read_file("BPD_Arrests.geojson") # Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021
+url = "https://github.com/kathysanchez/bpd/releases/download/v1.0/BPD_Arrests.geojson"
+output_path = Path(__file__).parent / "BPD_Arrests.geojson"
+
+if not output_path.exists():
+    r = requests.get(url) # Download if it doesn't exist locally
+    r.raise_for_status() # Stop app if download fails
+    with open(output_path, "wb") as f:
+        f.write(r.content) # Write locally
+
+gdf = gpd.read_file(output_path) # Use local geojson or downloaded geojson 
+
+
 print(gdf.head())
 gdf.columns.tolist()
 
