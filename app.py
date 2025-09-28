@@ -1,25 +1,35 @@
 from pathlib import Path
 import os
 
-
 print(Path.cwd())  
-new_dir = Path(__file__).parent
+try:
+    new_dir = Path(__file__).resolve().parent # Run script
+except NameError:
+    new_dir = Path.cwd() # Run Spyder
+
 os.chdir(new_dir)  
 print(Path.cwd()) 
 
-import bpd_cleaning
+#import bpd_cleaning
 from dash import Dash, callback_context, dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import plotly.express as px
-
-
+import pandas as pd
 
 # App instance
 app = Dash(__name__, external_stylesheets=[dbc.themes.YETI]) # https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/explorer/
 
 # Import mostly cleaned data
 
-merged_descriptions = bpd_cleaning.merged_descriptions
+#merged_descriptions = bpd_cleaning.merged_descriptions 
+try:
+    gun_charges_path = Path(__file__).parent / "Gun_charges_cleaned.csv"
+except NameError:
+    gun_charges_path = Path.cwd() / "Gun_charges_cleaned.csv"
+
+# Read csv!
+
+merged_descriptions = pd.read_csv(gun_charges_path)
 
 # Sort charges except Other
 
@@ -36,7 +46,7 @@ print(sorted_charges)
 charge_options = [] # Create options 
 
 for charge in sorted_charges:
-    charge_options.append({'label': charge, 'value': charge})# Label is the displayed text and value is passed to callbacks
+    charge_options.append({'label': charge, 'value': charge}) # Label is the displayed text and value is passed to callbacks
 
     # Create bar data
 merged_descriptions_counts = merged_descriptions.groupby('Charge').count()
@@ -185,7 +195,7 @@ def update_map(selected_charges):
 
     return fig
 
-# Callback to update the bar fig based on dropdown selections
+# Callback to update the bar fig based on dropdfrom memory_profiler import memory_usageown selections
 @app.callback(
     Output('crime-bar', 'figure'),
     Input('charge-dropdown-filter', 'value')
@@ -218,13 +228,15 @@ def update_bar(selected_charges):
 server = app.server
 
 # Run locally 
-app.run_server(
-    host="0.0.0.0",
-    port=int(os.environ.get("PORT", 8050)),
-    debug=False
-)
-
+if __name__ == '__main__':
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 8050)),
+        debug=False
+    )
 
 # # Run server for local testing
 # if __name__ == '__main__':
 #     app.run(debug=False)
+
+

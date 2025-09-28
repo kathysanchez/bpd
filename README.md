@@ -20,6 +20,12 @@ This is a project mapping 2024 weapons-related incidents in the city. The data a
 `/CJIS/CJIS_codes.csv`  
   My cleaned version of cjiscode.xml.
 
+`CJIS/CJIS_subset_descriptions_list.csv`
+  Exported weapon offenses and manually cleaned them.
+  
+`CJIS/CJIS_subset_descriptions_list_edits.csv`
+  These are the manually cleaned weapons offenses. Read in bpd_cleaning.py.
+
 `/archive/`  
   Contains older files.
   

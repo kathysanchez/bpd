@@ -1,10 +1,8 @@
 # Ignore large files
-
-*.csv
 *.geojson
 
 # Ignore old files
-*/archive/
+/archive/
 
 # Ignore temp files
 __pycache__

@@ -6,7 +6,14 @@ import requests
 
 
 print(Path.cwd())  
-new_dir = Path(__file__).parent
+
+try:
+    new_dir = Path(__file__).resolve().parent
+except NameError:
+    new_dir = Path.cwd()
+
+print(new_dir)
+
 os.chdir(new_dir)  
 print(Path.cwd()) 
 
@@ -22,10 +29,18 @@ codes = codes.rename(columns={
 })
 codes.to_csv("./CJIS/CJIS_codes.csv", index=False)
 
-# Read arrest geojson file (Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021)
+# Define var for geojson file (Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021)
 
 url = "https://github.com/kathysanchez/bpd/releases/download/v1.0/BPD_Arrests.geojson"
-output_path = Path(__file__).parent / "BPD_Arrests.geojson"
+
+# Make path for geojson file
+
+try:
+    output_path = Path(__file__).parent / "BPD_Arrests.geojson"
+except NameError:
+    output_path = Path.cwd() / "BPD_Arrests.geojson"
+
+# Read arrest geojson file (Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021)
 
 if not output_path.exists():
     r = requests.get(url) # Download if it doesn't exist locally
@@ -103,7 +118,7 @@ dict_race = {"B":"Black", "W":"White", "U":"Race Unknown", "A":"Asian", "I":"Ame
 merged_subset["Gender"] = merged_subset["Gender"].replace(dict_sex)
 merged_subset["Race"] = merged_subset["Race"].replace(dict_race)
 
-# Export weapon offenses to manually clean descriptions
+# Export weapon offenses to manually clean descriptions. I manually cleaned them.
 
 #merged_offenses_list.to_csv(".CJIS/CJIS_subset_descriptions_list.csv", index=True)
 
@@ -126,3 +141,12 @@ merged_descriptions = merged_descriptions.rename(columns={
 # Review offenses 
 
 print(merged_descriptions.columns.tolist())
+
+# Save 
+
+try:
+    charges_path = Path(__file__).parent / "Gun_charges_cleaned.csv"
+except NameError:
+    charges_path = Path.cwd() / "Gun_charges_cleaned.csv"
+    
+merged_descriptions.to_csv(charges_path, index=False)
