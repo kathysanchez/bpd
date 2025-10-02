@@ -87,7 +87,7 @@ app.layout = html.Div(
     children = [
         html.H1("Baltimore Weapon-Related Arrests, 2024", className='heading'), 
         
-        # First row
+        # First row - Filter and map
         dbc.Row(
             [
                 dbc.Col(
@@ -127,7 +127,7 @@ app.layout = html.Div(
             className='first-row',
         ),
     
-    # Second row
+    # Second row - Bar graph
     dbc.Row(
         [    
             dbc.Col(width=0, md=3), 
@@ -149,12 +149,12 @@ app.layout = html.Div(
                 [
                     html.H4("Data"),
                     html.P([
-                        "The data are from the publicly available Baltimore City dataset, 911 Calls For Service 2024. The crime categories shown here do not match Maryland’s official crime codes one-to-one. I combined and simplified some of the original categories to make them easier to interpret. For full details on the cleaning and analysis, see the ",
+                        "The crimes represent leading charges for each arrest resulting from a 911 call in 2024. The data source is Baltimore City's publicly available Baltimore City dataset: 911 Calls For Service 2024. The crimes shown here do not match Maryland’s official crime codes one-to-one. I combined and simplified some of the official crime codes to make the data easier to interpret. For full details on the cleaning and analysis, see the ",
                         html.A(
                             "GitHub repo",
                             href="https://github.com/kathysanchez/bpd",
                             target="_blank",
-                            style={'color': '#636efa', 'textDecoration': 'none'}  
+                            style={'color': '#636efa', 'textDecoration': 'none'}
                         ),
                         "."
                     ],
@@ -176,7 +176,7 @@ app.layout = html.Div(
                     className="paragraph-text"
                     ),
                 html.P(
-                    "I work on criminal justice and crime and have a personal and policy interest in guns. Message me on social media for questions or to collab. I love talking about guns, the national debt, regulation, education and other topics.",
+                    "I work on criminal justice and crime and have a personal and policy interest in guns. Message me on social media for questions or to collab. Besides guns, I also work on economic mobility, regulation, education and other topics.",
                     className="paragraph-text"
                     )
             ],
@@ -246,7 +246,7 @@ def update_map(selected_charges):
     # Make empty map for no selections
     if not selected_charges:
         fig = px.scatter_mapbox(
-            lat=[39.2904], lon=[-76.6122], zoom=12, height=450,
+            lat=[39.2904], lon=[-76.6122], zoom=12, height=400,
             center={"lat": 39.2904, "lon": -76.6122}, mapbox_style="carto-positron"
         )
         fig.update_layout(
@@ -267,7 +267,7 @@ def update_map(selected_charges):
         custom_data=["Charge", "Age", "Sex", "Race", "Detail"],
         zoom=12,
         center={"lat": 39.2904, "lon": -76.6122},
-        height=450
+        height=400
     )
     fig.update_traces(
         hovertemplate=", ".join([
@@ -317,16 +317,9 @@ def update_bar(selected_charges):
 # Flask for Gunicorn
 server = app.server
 
-# Run locally 
 if __name__ == '__main__':
     app.run(
         host="0.0.0.0",
         port=int(os.environ.get("PORT", 8050)),
         debug=False
     )
-
-# # Run server for local testing
-# if __name__ == '__main__':
-#     app.run(debug=False)
-
-
