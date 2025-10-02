@@ -315,7 +315,7 @@ def update_bar(selected_charges):
     return bar
 
 # Flask for Gunicorn
-#server = app.server
+server = app.server
 
 # Run locally 
 if __name__ == '__main__':
