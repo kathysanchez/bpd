@@ -19,13 +19,6 @@
   min-height: 300px;
   width: 100%;
 }
-    /* SECOND ROW */
-
-.second-row {
-  margin-top: 0px;
-  margin-left: 30px;
-  margin-right: 30px;
-}
 .bar-container {
   margin-top: 0px;
   min-height: 300px;
@@ -37,7 +30,8 @@
 .paragraph-text {
     color: #333;
 }
-    /* FIFTH ROW */
+
+    /* FOURTH ROW */
 
 .profile-links {
   font-size: 14px;
@@ -55,7 +49,7 @@
 }
     /* FIRST ROW */
 
-.first-row {
+  .first-row {
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 20px;
@@ -68,22 +62,13 @@
     min-height: 60px;
     margin-top: 20px;
   }
-    
-    /* SECOND ROW */
 
-  .second-row {
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-
-  }
   .bar-container {
     margin-top: 0px;
     min-height: 60px;
-  }
+  }    
 
-  /* THIRD AND FOURTH ROWS */
+  /* SECOND and THIRD ROWS */
 
   .paragraph-text {
     font-size: 14px;  

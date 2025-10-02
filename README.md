@@ -21,10 +21,10 @@ This is a project mapping 2024 weapons-related incidents in the city. The data a
   My cleaned version of cjiscode.xml.
 
 `CJIS/CJIS_subset_descriptions_list.csv`
-  Exported weapon offenses and manually cleaned them.
+  This is an exported list of original Maryland crime code descriptions. I exported them here to manually clean them.
   
 `CJIS/CJIS_subset_descriptions_list_edits.csv`
-  These are the manually cleaned weapons offenses. Read in bpd_cleaning.py.
+  This file shows original Maryland crime code descriptions and how I manually combined and simplified them into new categories. bpd_cleaning.py reads in this CSV.
 
 `/archive/`  
   Contains older files.

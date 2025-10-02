@@ -120,7 +120,7 @@ dict_race = {"B":"Black", "W":"White", "U":"Race Unknown", "A":"Asian", "I":"Ame
 merged_subset["Gender"] = merged_subset["Gender"].replace(dict_sex)
 merged_subset["Race"] = merged_subset["Race"].replace(dict_race)
 
-# Export weapon offenses to manually clean descriptions. I manually cleaned them.
+# Export weapon offenses to manually clean descriptions. I manually cleaned them. This file shows how I combined and simplified Maryland crime code descriptions.
 
 #merged_offenses_list.to_csv(".CJIS/CJIS_subset_descriptions_list.csv", index=True)
 
