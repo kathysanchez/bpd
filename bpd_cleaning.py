@@ -5,9 +5,11 @@ import os
 import requests
 
 
+# Change path
+
 print(Path.cwd())  
 
-try:
+try: # 
     new_dir = Path(__file__).resolve().parent
 except NameError:
     new_dir = Path.cwd()

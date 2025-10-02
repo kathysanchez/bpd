@@ -22,14 +22,13 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.YETI]) # https://dash-boot
 # Import mostly cleaned data
 
 #merged_descriptions = bpd_cleaning.merged_descriptions 
-try:
+try: # Assign path
     gun_charges_path = Path(__file__).parent / "Gun_charges_cleaned.csv"
 except NameError:
     gun_charges_path = Path.cwd() / "Gun_charges_cleaned.csv"
 
-# Read csv!
 
-merged_descriptions = pd.read_csv(gun_charges_path)
+merged_descriptions = pd.read_csv(gun_charges_path) # Read csv
 
 # Sort charges except Other
 
@@ -49,17 +48,46 @@ for charge in sorted_charges:
     charge_options.append({'label': charge, 'value': charge}) # Label is the displayed text and value is passed to callbacks
 
     # Create bar data
+    
 merged_descriptions_counts = merged_descriptions.groupby('Charge').count()
 print(merged_descriptions.dtypes)
 merged_descriptions_counts['Arrests'] = merged_descriptions_counts['ChargeDescription']
 print(merged_descriptions_counts.head())
 merged_descriptions_counts = merged_descriptions_counts.reset_index()
 
-# Layout
+# Links for dashboard footer
+
+    # Store my footer links
+links = [
+    ("Website", "https://kathysanchez.github.io/"),
+    ("GitHub", "https://github.com/kathysanchez"),
+    ("LinkedIn", "https://linkedin.com/in/kathy-sanchez-"),
+    ("X", "https://x.com/gkathysanchez")
+]
+
+    # Build link components
+link_components = []
+for index, (text, url) in enumerate(links):
+    link_components.append(
+        html.A(
+            text,
+            href=url,
+            target="_blank",
+            className="profile-links",  
+            style={'color': '#636efa', 'textDecoration': 'none'}
+        )
+    )
+    # Separate links with horizontal bar except after the last item
+    if index < len(links) - 1:
+        link_components.append(" | ")
+
+# Dashboard layout
 
 app.layout = html.Div(
     children = [
-        html.H1("Baltimore Weapons-Related Arrests, 2024", style={'marginLeft':'30px', 'marginTop':'10px'}), 
+        html.H1("Baltimore Weapon-Related Arrests, 2024", className='heading'), 
+        
+        # First row
         dbc.Row(
             [
                 dbc.Col(
@@ -67,7 +95,6 @@ app.layout = html.Div(
                         html.Label("Select Charge", style={
                         'fontSize': '16px',
                         'color': '#333',
-                        'marginBottom': '10px',
                         }),
                         html.Div(
                             dcc.Checklist(
@@ -86,29 +113,87 @@ app.layout = html.Div(
                             )
                         )
                     ],
-                    width=3, #style={'height': '350px'}
+                    xs=12, sm=12, md=3,
+                    className='filter-col'
                     ),
                 dbc.Col(
-                    dcc.Graph(id='crime-map',
-                        style={'marginRight':'30px', 'height': '350px'}
-                    ), 
-                width=9)],
-            style={'marginTop':'40px', 'marginLeft':'30px', 'height': '390px'}
+                    html.Div(
+                        dcc.Graph(id='crime-map'),
+                        className='map-container'
+                    ),
+                    xs=12, sm=12, md=8,
+                ),
+            ],
+            className='first-row',
         ),
+    
+    # Second row
     dbc.Row(
         [    
-            dbc.Col(width=3), 
+            dbc.Col(width=0, md=3), 
             dbc.Col(
                 html.Div(
-                    dcc.Graph(
-                        id='crime-bar',
-                        style={'marginRight':'30px'}
-                    )
+                        dcc.Graph(id='crime-bar'),
+                        className='bar-container'
+                    ),
+                    xs=12, sm=12, md=9,
                 )
-            )
-        ],
-        style={'marginLeft':'30px', 'height': '350px'}
-    )
+            ],
+            className='second-row',
+        ),
+    
+    # Third row - "Data"
+
+    dbc.Row(
+        dbc.Col(
+                [
+                    html.H4("Data"),
+                    html.P([
+                        "The data are from the publicly available Baltimore City dataset, 911 Calls For Service 2024. The crime categories shown here do not match Maryland’s official crime codes one-to-one. I combined and simplified some of the original categories to make them easier to interpret. For full details on the cleaning and analysis, see the ",
+                        html.A(
+                            "GitHub repo",
+                            href="https://github.com/kathysanchez/bpd",
+                            target="_blank",
+                            style={'color': '#636efa', 'textDecoration': 'none'}  
+                        ),
+                        "."
+                    ],
+                    className="paragraph-text"
+                    )
+                ],
+                xs=12, sm=12, md=5,
+            ),
+            style={'margin': '30px'}
+        ),
+
+    # Fourth row - "About"
+    dbc.Row(
+        dbc.Col(
+            [
+                html.H4("About"),
+                html.P(
+                    "This is an ongoing personal project by Kathy Sanchez, an independent researcher and data analyst living in Baltimore County. I’m making this dashboard to better understand violent and non-violent gun-related crimes in the city.",
+                    className="paragraph-text"
+                    ),
+                html.P(
+                    "I work on criminal justice and crime and have a personal and policy interest in guns. Message me on social media for questions or to collab. I love talking about guns, the national debt, regulation, education and other topics.",
+                    className="paragraph-text"
+                    )
+            ],
+            xs=12, sm=12, md=5,
+        ),
+        style={'margin': '30px'}
+        ),
+    
+    # Fifth row - Footer
+    
+    dbc.Row(
+        dbc.Col(
+            html.P(link_components, className="profile-links"),
+            xs=12, sm=12, md=12,
+        ),
+        style={'margin': '30px'}
+        )
     ]
 )
 
@@ -161,10 +246,13 @@ def update_map(selected_charges):
     # Make empty map for no selections
     if not selected_charges:
         fig = px.scatter_mapbox(
-            lat=[39.2904], lon=[-76.6122], zoom=12, height=350,
+            lat=[39.2904], lon=[-76.6122], zoom=12, height=450,
             center={"lat": 39.2904, "lon": -76.6122}, mapbox_style="carto-positron"
         )
-        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        fig.update_layout(
+            margin={"r": 0, "t": 0, "l": 0, "b": 0},
+            font=dict(color="#333")
+        )
         return fig
 
     # Filter data based on selected charges
@@ -179,7 +267,7 @@ def update_map(selected_charges):
         custom_data=["Charge", "Age", "Sex", "Race", "Detail"],
         zoom=12,
         center={"lat": 39.2904, "lon": -76.6122},
-        height=350
+        height=450
     )
     fig.update_traces(
         hovertemplate=", ".join([
@@ -190,7 +278,8 @@ def update_map(selected_charges):
     )
     fig.update_layout(
         mapbox_style="carto-positron",
-        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        font=dict(color="#333")
     )
 
     return fig
@@ -219,13 +308,14 @@ def update_bar(selected_charges):
     bar.update_layout(
         xaxis_title=None,
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
-        paper_bgcolor='rgba(0,0,0,0)' 
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color="#333") 
     )
 
     return bar
 
 # Flask for Gunicorn
-server = app.server
+#server = app.server
 
 # Run locally 
 if __name__ == '__main__':
