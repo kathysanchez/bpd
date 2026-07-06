@@ -1,6 +1,6 @@
-### Baltimore City Police Mapped Arrest Locations for Weapons Incidents, 2024
+### Baltimore City Police Mapped Arrest Locations for Weapons Incidents, 2025
 
-This is a project mapping 2024 weapons-related incidents in the city. The data are from [https://data.baltimorecity.gov/datasets/5d378673c8f4427fb9d02de362d5b634_0/explore?location=-0.000000%2C0.000000%2C1.01](https://data.baltimorecity.gov/datasets/5d378673c8f4427fb9d02de362d5b634_0/explore?location=-0.000000%2C0.000000%2C1.01) 
+This is a project mapping 2024 weapons-related incidents in the city. The data are from [https://data.baltimorecity.gov/datasets/619ec10c14b346f784a5a07bad4c43cd_0/explore?location=39.297493%2C-76.618650%2C11](https://data.baltimorecity.gov/datasets/619ec10c14b346f784a5a07bad4c43cd_0/explore?location=39.297493%2C-76.618650%2C11) 
 
 `bpd_cleaning.py`  
   The primary script for cleaning the data.
@@ -9,7 +9,7 @@ This is a project mapping 2024 weapons-related incidents in the city. The data a
   The Plotly Dash dashboard application.
 
 `BPD_Arrests.geojson`  
-  Source is the OpenBaltimore website. Uploaded to GH via Release. Date updated 3/10/2025, date created 3/10/2021.
+  Source is the OpenBaltimore website. Date updated 6/29/2026, date created 3/10/2021, updated weekly.
   
 `/CJIS/`  
   Maryland Criminal Justice Information System codes and statute descriptions for my reference in understanding BPD arrest codes to clean and present them in a meaningful way.
@@ -39,4 +39,4 @@ Earlier version of a map for this project.
   web: gunicorn app:server
 
 `runtime.txt`  
-  python-3.12.3
+  python-3.14.6
