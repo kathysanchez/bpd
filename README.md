@@ -30,10 +30,16 @@ This is a project mapping 2025 weapons-related incidents in the city. The data a
   Contains older files. 
 
 `requirements.txt`  
-  Requirements for the program and app. 
+  Dependencies for running `app.py` (what gets deployed to Render).
+
+`requirements-dev.txt`  
+  Extra local-only dependencies for `bpd_cleaning.py` (geopandas and friends). Install with `pip install -r requirements.txt -r requirements-dev.txt`.
 
 `Procfile`  
-  web: gunicorn app:server 
+  web: gunicorn app:server --bind 0.0.0.0:$PORT
+
+`.python-version`  
+  Python version for Render (Render doesn't read `runtime.txt`).
 
 `runtime.txt`  
-  python-3.14.6
+  Python version for Heroku-style platforms that do read it; kept in sync with `.python-version`.

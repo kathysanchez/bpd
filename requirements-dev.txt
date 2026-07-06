@@ -1,0 +1,8 @@
+# Extra local-only dependencies for bpd_cleaning.py (not needed to run app.py,
+# so they're kept out of requirements.txt to keep the deployed build small).
+# Install with: pip install -r requirements.txt -r requirements-dev.txt
+geopandas==1.1.4
+pyogrio==0.13.0
+shapely==2.1.2
+pyproj==3.7.2
+lxml==6.1.1
