@@ -1,6 +1,6 @@
 ### Baltimore City Police Mapped Arrest Locations for Weapons Incidents, 2025
 
-This is a project mapping 2024 weapons-related incidents in the city. The data are from [https://data.baltimorecity.gov/datasets/619ec10c14b346f784a5a07bad4c43cd_0/explore?location=39.297493%2C-76.618650%2C11](https://data.baltimorecity.gov/datasets/619ec10c14b346f784a5a07bad4c43cd_0/explore?location=39.297493%2C-76.618650%2C11) 
+This is a project mapping 2025 weapons-related incidents in the city. The data are from [https://data.baltimorecity.gov/datasets/619ec10c14b346f784a5a07bad4c43cd_0/explore?location=39.297493%2C-76.618650%2C11](https://data.baltimorecity.gov/datasets/619ec10c14b346f784a5a07bad4c43cd_0/explore?location=39.297493%2C-76.618650%2C11) 
 
 `bpd_cleaning.py`  
   The primary script for cleaning the data.
@@ -27,16 +27,13 @@ This is a project mapping 2024 weapons-related incidents in the city. The data a
   This file shows original Maryland crime code descriptions and how I manually combined and simplified them into new categories. bpd_cleaning.py reads in this CSV.
 
 `/archive/`  
-  Contains older files.
-  
-`/archive/911_Weapons_Incident_Inner_Harbor_Locations_2024.html`  
-Earlier version of a map for this project.  
+  Contains older files. 
 
 `requirements.txt`  
-  Requirements for the program and app.
+  Requirements for the program and app. 
 
 `Procfile`  
-  web: gunicorn app:server
+  web: gunicorn app:server 
 
 `runtime.txt`  
   python-3.14.6
