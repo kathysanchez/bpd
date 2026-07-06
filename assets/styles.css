@@ -1,77 +1,188 @@
-/* DEFAULT AND DESKTOP SCREENS */
-.heading {
-  margin-left: 30px; 
-  margin-top: 10px;
+/* Dash's own dropdown/checklist components use this variable for the checked
+   checkbox, focus rings, and "selected" highlight color — it defaults to a
+   purple (#7f4bc4). Override it once, globally, to match the page's link
+   color instead. */
+:root {
+  --Dash-Fill-Interactive-Strong: #636efa;
 }
+
+/* DEFAULT AND DESKTOP SCREENS */
+
+.page-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.header-block {
+  margin-top: 40px;
+  margin-bottom: 32px;
+}
+.heading {
+  margin: 0 0 10px 0;
+  color: #1a1a1a;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.subheading {
+  margin: 0;
+  color: #52514e;
+  font-size: 17px;
+  line-height: 1.5;
+  max-width: 720px;
+}
+
     /* FIRST ROW */
 
 .first-row {
-  margin-top: 40px;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-bottom: 8px;
 }
+
+/* Shared "widget" look for the filter panel and the two chart cards */
+.card-panel {
+  background-color: #ffffff;
+  border: 1px solid #e9e8e3;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(17,17,17,0.06);
+}
+
 .filter-col {
   margin-left: 0px;
+  padding: 26px 26px 12px 26px;
 }
-.map-container {
-  margin-top: 30px;
-  margin-bottom: 0px;
-  min-height: 300px;
-  width: 100%;
+.filter-block {
+  margin-bottom: 26px;
 }
-.bar-container {
-  margin-top: 0px;
-  min-height: 300px;
+.filter-block:last-child {
+  margin-bottom: 6px;
+}
+.filter-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.chart-card {
+  padding: 22px 24px 18px 24px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.chart-card:last-child {
+  margin-bottom: 0;
+}
+.chart-title {
+  margin: 0 0 16px 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.map-container, .bar-container {
   width: 100%;
 }
 
     /* THIRD AND FOURTH ROWS */
 
+.content-row {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid #e6e5e0;
+}
 .paragraph-text {
     color: #333;
+    font-size: 15px;
+    line-height: 1.6;
 }
 
     /* FOURTH ROW */
 
-.profile-links {
-  font-size: 14px;
-  text-align: center;
+.footer-row {
+  margin-top: 40px;
+  padding: 24px 0 32px 0;
+  border-top: 1px solid #e6e5e0;
 }
+.profile-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Footer icons: a plain masked square recolored via background-color, so the
+   same technique themes the fetched website favicon and the hand-authored
+   SVG marks identically. Muted gray at rest, the page's link blue on hover. */
+.footer-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+.footer-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #9a988f;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  transition: background-color 0.15s ease;
+}
+.footer-icon-link:hover .footer-icon,
+.footer-icon-link:focus-visible .footer-icon {
+  background-color: #636efa;
+}
+.footer-icon-website { -webkit-mask-image: url('icons/website.png'); mask-image: url('icons/website.png'); }
+.footer-icon-github   { -webkit-mask-image: url('icons/github.svg'); mask-image: url('icons/github.svg'); }
+.footer-icon-linkedin { -webkit-mask-image: url('icons/linkedin.svg'); mask-image: url('icons/linkedin.svg'); }
+.footer-icon-x        { -webkit-mask-image: url('icons/x.svg'); mask-image: url('icons/x.svg'); }
 
 
 
 
 /* MOBILE AND SMALL SCREENS */
 @media screen and (max-width: 768px) {
+  .page-container {
+    padding: 0 12px;
+  }
+  .header-block {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
   .heading {
-    margin-left: 10px; 
-    margin-top: 10px;
-}
+    margin: 0 0 6px 0;
+  }
+  .subheading {
+    font-size: 15px;
+  }
     /* FIRST ROW */
 
   .first-row {
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 20px;
+    margin-top: 0px;
     margin-bottom: 0px;
   }
   .filter-col {
     margin-right: 0px ;
-  } 
-  .map-container {
-    min-height: 60px;
-    margin-top: 20px;
+    padding: 18px 18px 6px 18px;
   }
-
-  .bar-container {
-    margin-top: 0px;
-    min-height: 60px;
-  }    
+  .chart-card {
+    padding: 16px 16px 10px 16px;
+    margin-bottom: 20px;
+  }
 
   /* SECOND and THIRD ROWS */
 
+  .content-row {
+    margin-top: 28px;
+    padding-top: 20px;
+  }
   .paragraph-text {
-    font-size: 14px;  
+    font-size: 14px;
     color: #333;
 }
 }
