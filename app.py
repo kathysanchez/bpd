@@ -400,6 +400,12 @@ def update_bar(selected_charges, selected_sexes, selected_districts, selected_ne
         height=420
     )
 
+    # Drop plotly's auto-generated "Charge_Color_Group=..." hover line (an
+    # artifact of the internal color-grouping column, not meant to be shown)
+    bar.update_traces(
+        hovertemplate="Charge=%{x}<br>Arrests=%{y}<extra></extra>"
+    )
+
     bar.update_layout(
         xaxis_title=None,
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
@@ -412,7 +418,7 @@ def update_bar(selected_charges, selected_sexes, selected_districts, selected_ne
     return bar
 
 # Flask for Gunicorn
-server = app.server
+#server = app.server
 
 if __name__ == '__main__':
     app.run(
