@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import os
 import requests
+import json
 
 
 # Change path
@@ -31,26 +32,65 @@ codes = codes.rename(columns={
 })
 codes.to_csv("./CJIS/CJIS_codes.csv", index=False)
 
-# Define var for geojson file (Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021)
+# Define source for arrest data: Open Baltimore's live "BPD Arrests" feed
+# (updated weekly, rolling from 2010-present). Replaces the frozen 2024
+# GitHub-release snapshot used previously.
 
-url = "https://github.com/kathysanchez/bpd/releases/download/v1.0/BPD_Arrests.geojson"
+TARGET_YEAR = 2025
+
+query_url = "https://egis.baltimorecity.gov/egis/rest/services/GeoSpatialized_Tables/Arrest/FeatureServer/0/query"
+
+# Query a few days past the calendar-year boundary on each side: ArrestDateTime
+# is stored as UTC epoch ms, so a strict Jan 1-Dec 31 UTC window can drop/add a
+# handful of records that fall on the other side of midnight in Baltimore's
+# local time. The exact year is enforced below after converting to local time.
+where_clause = (
+    f"ArrestDateTime >= timestamp '{TARGET_YEAR - 1}-12-25 00:00:00' "
+    f"AND ArrestDateTime <= timestamp '{TARGET_YEAR + 1}-01-05 00:00:00'"
+)
 
 # Make path for geojson file
 
 try:
-    output_path = Path(__file__).parent / "BPD_Arrests.geojson"
+    output_path = Path(__file__).parent / f"BPD_Arrests_{TARGET_YEAR}.geojson"
 except NameError:
-    output_path = Path.cwd() / "BPD_Arrests.geojson"
+    output_path = Path.cwd() / f"BPD_Arrests_{TARGET_YEAR}.geojson"
 
-# Read arrest geojson file (Source: Open Baltimore. Date updated 3/10/2025 Date created 3/10/2021)
+# Read arrest geojson file, paginating since the server caps responses at
+# 1,000 records per request (a full year is ~16k arrests).
 
 if not output_path.exists():
-    r = requests.get(url) # Download if it doesn't exist locally
-    r.raise_for_status() # Stop app if download fails
-    with open(output_path, "wb") as f:
-        f.write(r.content) # Write locally
+    features = []
+    page_size = 1000
+    offset = 0
+    while True:
+        params = {
+            "where": where_clause,
+            "outFields": "*",
+            "f": "geojson",
+            "resultOffset": offset,
+            "resultRecordCount": page_size,
+        }
+        r = requests.get(query_url, params=params)
+        r.raise_for_status() # Stop app if download fails
+        batch = r.json().get("features", [])
+        features.extend(batch)
+        if len(batch) < page_size:
+            break
+        offset += page_size
 
-gdf = gpd.read_file(output_path) # Use local geojson or downloaded geojson 
+    with open(output_path, "w") as f:
+        json.dump({"type": "FeatureCollection", "features": features}, f)
+
+gdf = gpd.read_file(output_path) # Use local geojson or downloaded geojson
+
+# ArrestDateTime comes back as epoch milliseconds (UTC), not an ISO string,
+# so it isn't auto-parsed to a datetime dtype by the GeoJSON reader.
+gdf["ArrestDateTime"] = (
+    pd.to_datetime(gdf["ArrestDateTime"], unit="ms", utc=True)
+    .dt.tz_convert("America/New_York")
+    .dt.tz_localize(None)
+)
 
 
 print(gdf.head())
@@ -76,9 +116,9 @@ gdf_nonmissing.ArrestDateTime.value_counts()
 gdf_nonmissing.dtypes
 
 
-# Subset 2024 only
+# Subset target year only
 
-gdf_nonmissing = gdf_nonmissing[gdf_nonmissing['ArrestDateTime'].dt.year == 2024]
+gdf_nonmissing = gdf_nonmissing[gdf_nonmissing['ArrestDateTime'].dt.year == TARGET_YEAR]
 
 # Check whether arrest and incidents match (they do)
 

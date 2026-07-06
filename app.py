@@ -85,7 +85,7 @@ for index, (text, url) in enumerate(links):
 
 app.layout = html.Div(
     children = [
-        html.H1("Baltimore Weapon-Related 911 Arrests, 2024", className='heading'), 
+        html.H1("Baltimore Weapon-Related 911 Arrests, 2025", className='heading'), 
         
         # First row - Filter column and figures column
         dbc.Row(
@@ -141,7 +141,7 @@ app.layout = html.Div(
                 [
                     html.H4("Data"),
                     html.P([
-                        "The arrests represent the leading charge for each arrest that resulted from a 911 call in 2024. Unless specified, weapon-related arrests may include weapons other than guns. The data source is Baltimore City's publicly available Baltimore City dataset: 911 Calls For Service 2024. The crimes shown here do not match Maryland’s official crime codes one-to-one. I combined and simplified some of the official crime codes to make the data easier to interpret. For full details on the cleaning and analysis, see the ",
+                        "The arrests represent the leading charge for each arrest that resulted from a 911 call in 2025. Unless specified, weapon-related arrests may include weapons other than guns. The data source is Baltimore City's publicly available Baltimore City dataset: 911 Calls For Service 2025. The crimes shown here do not match Maryland’s official crime codes one-to-one. I combined and simplified some of the official crime codes to make the data easier to interpret. For full details on the cleaning and analysis, see the ",
                         html.A(
                             "GitHub repo",
                             href="https://github.com/kathysanchez/bpd",
