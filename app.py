@@ -415,6 +415,7 @@ def update_bar(selected_charges, selected_sexes, selected_districts, selected_ne
         margin={"l": 10, "r": 10, "t": 10, "b": 10}
     )
 
+    return bar
 
 # Flask for Gunicorn
 server = app.server
